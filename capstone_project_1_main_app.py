@@ -237,7 +237,7 @@ def analisis_data():
         clear_screen()
         print("--- Menu Analisis & Visualisasi Data ---")
         print("1. Tampilkan Statistik Deskriptif IPK")
-        print("2. Tampilkan Jumlah Mahasiswa per Departemen")
+        print("2. Visualisasi: Jumlah Mahasiswa per Departemen (Pie Chart)")
         print("3. Visualisasi: Distribusi IPK (Histogram)")
         print("4. Visualisasi: Rata-rata IPK er Departemen (Bar Chart)")
         print("5. Kembali ke Menu Utama")
@@ -249,9 +249,14 @@ def analisis_data():
             input("\nTekan Enter untuk kembali...")
         
         elif pilihan == '2':
-            print("\n---Jumlah Mahasiswa per Departemen---")
-            print(df['Departemen'].value_counts())
-            input("\nTekan Enter untuk kembali...")
+            print("\n---Menampilkan Plot Jumlah Mahasiswa per Departemen---")
+            departemen_counts = df['Departemen'].value_counts()
+            
+            plt.figure(figsize=(12, 8)) # Ukuran figure agar label tidak tumpang tindih
+            plt.pie(departemen_counts, labels=departemen_counts.index, autopct='%1.1f%%', startangle=90)
+            plt.title('Persentase Jumlah Mahasiswa per Departemen')
+            plt.axis('equal')  # Memastikan pie chart berbentuk lingkaran
+            plt.show()
         
         elif pilihan == '3':
             print("\n---Menampilkan Plot Distribusi IPK---")
