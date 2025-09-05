@@ -40,41 +40,93 @@ def tampilkan_data():
     while True:
         clear_screen()
         print("---Menu Tampilkan Data Mahasiswa---")
-        print("1. Tampilkan Semua Data")
-        print("2. Filter/Cari Data Berdasarkan Departemen")
-        print("3. Kembali ke Menu Utama")
-        pilihan = input("Pilih Menu (1-3): ")
+        print("1. Tampilkan 100 Data Mahasiswa")
+        print("2. Tampilkan Data Departemen")
+        print("3. Tampilkan Data Jurusan")
+        print("4. Filter/Cari Data Berdasarkan Departemen")
+        print("5. Filter/Cari Data Berdasarkan Jurusan")
+        print("6. Cari Data Berdasarkan NPM")
+        print("7. Kembali ke Menu Utama")
+        pilihan = input("Pilih Menu (1-7): ")
 
         if pilihan == '1':
             try:
                 # Menggunakan pandas untuk membaca dan menampilkan data dengan rapi
-                df = pd.read_sql("SELECT * FROM mahasiswa ORDER BY Nama ASC", conn)
-                print("\n--- Seluruh Data Mahasiswa FTUI 2021 ---")
+                df = pd.read_sql("SELECT * FROM mahasiswa ORDER BY Nama ASC LIMIT 100", conn)
+                print("\n--- 100 Data Mahasiswa FTUI 2021 ---")
                 print(df.to_string()) # .to_string() agar semua baris ditampilkan
             except Exception as e:
                 print(f"Terjadi error: {e}")
             input("\nTekan Enter untuk Kembali")
 
-        if  pilihan == '2':
+        elif pilihan == '2':
+            try:
+                df = pd.read_sql("SELECT DISTINCT Departemen FROM mahasiswa ORDER BY Departemen ASC", conn)
+                print("\n--- Daftar Departemen ---")
+                print(df.to_string())
+            except Exception as e:
+                print(f"Terjadi error: {e}")
+            input("\nTekan Enter untuk Kembali")
+
+        elif pilihan == '3':
+            try:
+                df = pd.read_sql("SELECT DISTINCT Jurusan FROM mahasiswa ORDER BY Jurusan ASC", conn)
+                print("\n--- Daftar Jurusan ---")
+                print(df.to_string())
+            except Exception as e:
+                print(f"Terjadi error: {e}")
+            input("\nTekan Enter untuk Kembali")
+
+        elif pilihan == '4':
             try:
                 keyword = input("Masukkan nama Departemen yang dicari: ")
                 query = "SELECT * FROM mahasiswa WHERE Departemen LIKE %s"
                 # Menggunakan %keyword% untuk pencarian yang lebih fleksibel
-                df = pd.read_sql(query, conn, params=[f"%{keyword}"])
+                df = pd.read_sql(query, conn, params=[f"%{keyword}%"])
 
                 if df.empty:
-                    print(f"\nTidak Hasil Pencarian untuk '{keyword}'.")
+                    print(f"\nTidak ada hasil pencarian untuk '{keyword}'.")
                 else:
                     print(f"\n--- Hasil Pencarian untuk '{keyword}' ---")
                     print(df.to_string())
             except Exception as e:
                 print(f"Terjadi error {e}")
             input("\nTekan Enter untuk kembali...")
+
+        elif pilihan == '5':
+            try:
+                keyword = input("Masukkan nama Jurusan yang dicari: ")
+                query = "SELECT * FROM mahasiswa WHERE Jurusan LIKE %s"
+                df = pd.read_sql(query, conn, params=[f"%{keyword}%"])
+
+                if df.empty:
+                    print(f"\nTidak ada hasil pencarian untuk '{keyword}'.")
+                else:
+                    print(f"\n--- Hasil Pencarian untuk '{keyword}' ---")
+                    print(df.to_string())
+            except Exception as e:
+                print(f"Terjadi error {e}")
+            input("\nTekan Enter untuk kembali...")
+
+        elif pilihan == '6':
+            try:
+                npm = input("Masukkan NPM yang dicari: ")
+                query = "SELECT * FROM mahasiswa WHERE NPM = %s"
+                df = pd.read_sql(query, conn, params=[npm])
+
+                if df.empty:
+                    print(f"\nTidak ada mahasiswa dengan NPM '{npm}'.")
+                else:
+                    print(f"\n--- Hasil Pencarian untuk NPM '{npm}' ---")
+                    print(df.to_string())
+            except Exception as e:
+                print(f"Terjadi error {e}")
+            input("\nTekan Enter untuk kembali...")
         
-        elif pilihan == '3':
+        elif pilihan == '7':
             break
         else:
-            input("Pilihan idak valid. Tekan Enter untuk mencoba lagi...")
+            input("Pilihan tidak valid. Tekan Enter untuk mencoba lagi...")
     
     if conn  and conn.is_connected():
         conn.close()
@@ -131,7 +183,7 @@ def tambah_data():
 
         # Validasi 3: Pengecekan pilihan Jenis Kelamin
         while True:
-            jenis_kelamin = input("Masukkan Jenis Kelamin ('Laki-laki' atau 'Perempuan')")
+            jenis_kelamin = input("Masukkan Jenis Kelamin (Laki-laki atau Perempuan): ")
             if jenis_kelamin in ['Laki-laki','Perempuan']:
                 break
             else:
@@ -185,7 +237,7 @@ def analisis_data():
         clear_screen()
         print("--- Menu Analisis & Visualisasi Data ---")
         print("1. Tampilkan Statistik Deskriptif IPK")
-        print("2. Tampilkan Jumlah Mahasiswa per Departemen")
+        print("2. Visualisasi: Jumlah Mahasiswa per Departemen (Pie Chart)")
         print("3. Visualisasi: Distribusi IPK (Histogram)")
         print("4. Visualisasi: Rata-rata IPK er Departemen (Bar Chart)")
         print("5. Kembali ke Menu Utama")
@@ -197,9 +249,14 @@ def analisis_data():
             input("\nTekan Enter untuk kembali...")
         
         elif pilihan == '2':
-            print("\n---Jumlah Mahasiswa per Departemen---")
-            print(df['Departemen'].value_counts())
-            input("\nTekan Enter untuk kembali...")
+            print("\n---Menampilkan Plot Jumlah Mahasiswa per Departemen---")
+            departemen_counts = df['Departemen'].value_counts()
+            
+            plt.figure(figsize=(12, 8)) # Ukuran figure agar label tidak tumpang tindih
+            plt.pie(departemen_counts, labels=departemen_counts.index, autopct='%1.1f%%', startangle=90)
+            plt.title('Persentase Jumlah Mahasiswa per Departemen')
+            plt.axis('equal')  # Memastikan pie chart berbentuk lingkaran
+            plt.show()
         
         elif pilihan == '3':
             print("\n---Menampilkan Plot Distribusi IPK---")
@@ -265,5 +322,3 @@ if __name__ == "__main__":
 
 
         
-
-
