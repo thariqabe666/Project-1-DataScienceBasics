@@ -31,6 +31,7 @@ Menu ini menyediakan ringkasan statistik dan visualisasi data untuk mendapatkan 
 * **Visualisasi Data**:
     * **Histogram**: Menampilkan distribusi sebaran IPK seluruh mahasiswa.
     * **Bar Chart**: Menampilkan perbandingan rata-rata IPK antar departemen.
+    * **Pie Chart**: Menampilkan jumlah mahasiswa per departemen.
 
 ## 🛠️ Teknologi dan Library
 
